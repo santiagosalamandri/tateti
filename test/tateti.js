@@ -19,7 +19,7 @@ chai.use(chaiHttp);
 // no cambia.
 // - Cuando no quedan casillas vacias y no hay un ganador entonces hay un empate.
 
-describe("Juego de TaTeTi", () => {    
+describe("Juego de TaTeTi", () => {
     let juego = {
         jugadores: ['Juan', 'Pedro']
     }
@@ -33,22 +33,22 @@ describe("Juego de TaTeTi", () => {
     describe("Se empieza un juego nuevo", () => {
         it("Todos los casilleros estan vacios y le toca mover al primer jugador", (done) => {
             chai.request(server)
-            .put("/empezar")
-            .send(juego)
-            .end((err, res) => {
-                res.should.have.status(200);
-                res.should.to.be.json;
-                res.body.should.be.a('object');
-                // Le toca mover al primer jugador
-                res.body.should.have.property('turno').eql('Juan');
-                // Todos los casilleros estan vacios
-                res.body.should.have.property('tablero').eql([
-                    [' ', ' ', ' '],
-                    [' ', ' ', ' '],
-                    [' ', ' ', ' '],
-                ]);
-                done();
-            })
+                .put("/empezar")
+                .send(juego)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.should.to.be.json;
+                    res.body.should.be.a('object');
+                    // Le toca mover al primer jugador
+                    res.body.should.have.property('turno').eql('Juan');
+                    // Todos los casilleros estan vacios
+                    res.body.should.have.property('tablero').eql([
+                        [' ', ' ', ' '],
+                        [' ', ' ', ' '],
+                        [' ', ' ', ' '],
+                    ]);
+                    done();
+                })
         });
     });
     describe("El primer jugador hace su primer movimiento", () => {
@@ -90,6 +90,38 @@ describe("Juego de TaTeTi", () => {
                     ]);
                     done()
                 });
+        });
+    });
+    describe("Movimientos prohibidos", () => {
+        it("Jugador intenta ocupar un casillero ocupado ", (done) => {
+            chai.request(server).put("/empezar").send(juego).end();
+            chai.request(server).put("/movimiento").send(movimientos[0]).end();
+            chai.request(server)
+                .put("/movimiento")
+                .send({ jugador: 'Juan', columna: 1, fila: 0 })
+                .end((err, res) => {
+                    res.should.have.status(403);
+                    res.should.to.be.json;
+                    res.body.should.be.a('object');
+                    res.body.should.have.property('turno').eql('Pedro');
+                    res.body.should.have.property('tablero').eql([
+                        ['x', ' ', ' '],
+                        [' ', ' ', ' '],
+                        [' ', ' ', ' '],
+                    ]);
+                });
+            it("Jugador intenta ocupar un casillero fuera del tablero ", (done) => {
+
+            });
+            it("Jugador intenta ocupar un casillero cuando no quedan disponibles", (done) => {
+
+            });
+            it("Jugador intenta ocupar un casillero cuando el juego termino ", (done) => {
+
+            });
+            it("Jugador intenta ocupar un casillero cuando no es su turno ", (done) => {
+
+            });
         });
     });
 });
