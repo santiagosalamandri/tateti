@@ -10,7 +10,6 @@ const marcas = ['x', 'o'];
 
 function checkWinner() {
   for (let column = 0; column < 3; column++) {  //check column
-
     if (tablero[0][column] == tablero[1][column] && tablero[1][column] == tablero[2][column]) {
       return true;
     }

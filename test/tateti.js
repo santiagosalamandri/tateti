@@ -194,7 +194,7 @@ describe("Juego de TaTeTi", () => {
         });
     });
     describe("Juego terminado", () => {
-        it("Cuando un jugador tiene una columna completa", (done) => {
+        it("Cuando un jugador tiene una columna completa gana", (done) => {
             chai.request(server).put("/empezar").send(juego).end();
             let index = 0
             for (; index < movimientosGanadorColumna.length - 1; index++) {
@@ -217,7 +217,7 @@ describe("Juego de TaTeTi", () => {
             })
 
         });
-        it("Cuando un jugador tiene una fila completa", (done) => {
+        it("Cuando un jugador tiene una fila completa gana", (done) => {
             chai.request(server).put("/empezar").send(juego).end();
             let index = 0
             for (; index < movimientosGanadorFila.length - 1; index++) {
@@ -239,7 +239,7 @@ describe("Juego de TaTeTi", () => {
                 done()
             })
         });
-        it("Cuando un jugador tiene una diagonal completa", (done) => {
+        it("Cuando un jugador tiene una diagonal completa gana", (done) => {
             chai.request(server).put("/empezar").send(juego).end();
             let index = 0
             for (; index < movimientosGanadorDiagonal.length - 1; index++) {
@@ -262,4 +262,5 @@ describe("Juego de TaTeTi", () => {
             })
         });
     });
+    
 });
