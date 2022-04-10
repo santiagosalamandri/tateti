@@ -23,12 +23,31 @@ describe("Juego de TaTeTi", () => {
     let juego = {
         jugadores: ['Juan', 'Pedro']
     }
+    // ['x', 'o', 'x'],
+    // ['x', 'o', ' '],
+    // ['x', ' ', ' '],
     let movimientos = [
         { jugador: 'Juan', columna: 0, fila: 0 },
         { jugador: 'Pedro', columna: 1, fila: 0 },
         { jugador: 'Juan', columna: 0, fila: 1 },
         { jugador: 'Pedro', columna: 1, fila: 1 },
         { jugador: 'Juan', columna: 0, fila: 2 },
+    ]
+    // ['x', 'o', 'x'],
+    // ['o', 'x', 'o'],
+    // ['o', 'x', 'o'],
+    let movimientosEmpate = [
+        { jugador: 'Juan', columna: 0, fila: 0 },
+        { jugador: 'Pedro', columna: 1, fila: 0 },
+        { jugador: 'Juan', columna: 2, fila: 0 },
+
+        { jugador: 'Pedro', columna: 1, fila: 1 },
+        { jugador: 'Juan', columna: 0, fila: 1 },
+        { jugador: 'Pedro', columna: 2, fila: 1 },
+
+        { jugador: 'Juan', columna: 0, fila: 2 },
+        { jugador: 'Pedro', columna: 1, fila: 2 },
+        { jugador: 'Juan', columna: 2, fila: 2 },
     ]
     describe("Se empieza un juego nuevo", () => {
         it("Todos los casilleros estan vacios y le toca mover al primer jugador", (done) => {
@@ -129,10 +148,43 @@ describe("Juego de TaTeTi", () => {
                     });
             });
             it("Jugador intenta ocupar un casillero cuando no quedan disponibles", (done) => {
-
+                chai.request(server).put("/empezar").send(juego).end();
+                chai.request(server).put("/movimiento").send(movimientos[0]).end();
+                chai.request(server)
+                    .put("/movimiento")
+                    .send({ jugador: 'Pedro', columna: 3, fila: 3 })
+                    .end((err, res) => {
+                        res.should.have.status(403);
+                        res.should.to.be.json;
+                        res.body.should.be.a('object');
+                        res.body.should.have.property('turno').eql('Pedro');
+                        res.body.should.have.property('tablero').eql([
+                            ['x', ' ', ' '],
+                            [' ', ' ', ' '],
+                            [' ', ' ', ' '],
+                        ]);
+                    });
             });
-            it("Jugador intenta ocupar un casillero cuando el juego termino ", (done) => {
-
+            it("Jugador intenta ocupar un casillero cuando no hay mas movimientos posibles ", (done) => {
+                chai.request(server).put("/empezar").send(juego).end();
+                movimientosEmpate.forEach(movimiento => {
+                    chai.request(server).put("/movimiento").send(movimiento).end();
+                });
+                chai.request(server).put("/movimiento").send(movimientos[0]).end();
+                chai.request(server)
+                    .put("/movimiento")
+                    .send({ jugador: 'Pedro', columna: 1, fila: 1 })
+                    .end((err, res) => {
+                        res.should.have.status(403);
+                        res.should.to.be.json;
+                        res.body.should.be.a('object');
+                        res.body.should.have.property('estado').eql('Terminado');
+                        res.body.should.have.property('tablero').eql([
+                            ['x', 'o', 'x'],
+                            ['o', 'x', 'o'],
+                            ['o', 'x', 'o'],
+                        ]);
+                    });
             });
             it("Jugador intenta ocupar un casillero cuando no es su turno ", (done) => {
 
