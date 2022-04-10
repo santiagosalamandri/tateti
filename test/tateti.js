@@ -98,7 +98,7 @@ describe("Juego de TaTeTi", () => {
             chai.request(server).put("/movimiento").send(movimientos[0]).end();
             chai.request(server)
                 .put("/movimiento")
-                .send({ jugador: 'Juan', columna: 1, fila: 0 })
+                .send({ jugador: 'Pedro', columna: 1, fila: 0 })
                 .end((err, res) => {
                     res.should.have.status(403);
                     res.should.to.be.json;
@@ -111,7 +111,22 @@ describe("Juego de TaTeTi", () => {
                     ]);
                 });
             it("Jugador intenta ocupar un casillero fuera del tablero ", (done) => {
-
+                chai.request(server).put("/empezar").send(juego).end();
+                chai.request(server).put("/movimiento").send(movimientos[0]).end();
+                chai.request(server)
+                    .put("/movimiento")
+                    .send({ jugador: 'Pedro', columna: 3, fila: 3 })
+                    .end((err, res) => {
+                        res.should.have.status(403);
+                        res.should.to.be.json;
+                        res.body.should.be.a('object');
+                        res.body.should.have.property('turno').eql('Pedro');
+                        res.body.should.have.property('tablero').eql([
+                            ['x', ' ', ' '],
+                            [' ', ' ', ' '],
+                            [' ', ' ', ' '],
+                        ]);
+                    });
             });
             it("Jugador intenta ocupar un casillero cuando no quedan disponibles", (done) => {
 
