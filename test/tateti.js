@@ -54,8 +54,8 @@ describe("Juego de TaTeTi", () => {
         { jugador: 'Juan', columna: 2, fila: 0 },
     ]
     // ['x', 'o', 'x'],
-    // ['o', 'x', 'o'],
-    // ['o', 'x', 'o'],
+    // ['x', 'o', 'o'],
+    // ['o', 'x', 'x'],
     let movimientosEmpate = [
         { jugador: 'Juan', columna: 0, fila: 0 },
         { jugador: 'Pedro', columna: 1, fila: 0 },
@@ -65,9 +65,9 @@ describe("Juego de TaTeTi", () => {
         { jugador: 'Juan', columna: 0, fila: 1 },
         { jugador: 'Pedro', columna: 2, fila: 1 },
 
-        { jugador: 'Juan', columna: 0, fila: 2 },
-        { jugador: 'Pedro', columna: 1, fila: 2 },
         { jugador: 'Juan', columna: 2, fila: 2 },
+        { jugador: 'Pedro', columna: 0, fila: 2 },
+        { jugador: 'Juan', columna: 1, fila: 2 },
     ]
     describe("Se empieza un juego nuevo", () => {
         it("Todos los casilleros estan vacios y le toca mover al primer jugador", (done) => {
@@ -261,6 +261,26 @@ describe("Juego de TaTeTi", () => {
                 done()
             })
         });
+        it("Cuando no hay movimientos, hay un empate", (done) => {
+            chai.request(server).put("/empezar").send(juego).end();
+            let index = 0
+            for (; index < movimientosEmpate.length - 1; index++) {
+                chai.request(server).put("/movimiento").send(movimientosEmpate[index]).end();
+
+            }
+            chai.request(server).put("/movimiento").send(movimientosEmpate[index]).end((err, res) => {
+                res.should.have.status(200);
+                res.should.to.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('estado').eql('Terminado. Empate');
+                res.body.should.have.property('tablero').eql([
+                    ['x', 'o', 'x'],
+                    ['x', 'o', 'o'],
+                    ['o', 'x', 'x'],
+                ]);
+                done()
+            })
+        });
     });
-    
+
 });

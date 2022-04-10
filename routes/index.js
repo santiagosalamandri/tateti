@@ -4,23 +4,37 @@ var router = express.Router();
 var jugadores;
 var tablero;
 var turno;
-var estado;
-
+var hayGanador;
+var numMovimientos;
 const marcas = ['x', 'o'];
+const MAX_MOVIMIENTOS = 9
 
+function isTie() {
+  return (estado == 'No Terminado' && isFull() == true);
+}
+function isFull() {
+  return (numMovimientos == MAX_MOVIMIENTOS);
+}
 function checkWinner() {
+  //console.log(tablero);
+
   for (let column = 0; column < 3; column++) {  //check column
-    if (tablero[0][column] == tablero[1][column] && tablero[1][column] == tablero[2][column]) {
+    if (tablero[0][column] == tablero[1][column] && tablero[1][column] == tablero[2][column] && tablero[2][column]!=' ') {
+      console.log("TATETI COLUMNA "+column);
       return true;
     }
   }
   for (let fila = 0; fila < 3; fila++) {  //check row
-    if (tablero[fila][0] == tablero[fila][1] && tablero[fila][1] == tablero[fila][2]) {
+    if (tablero[fila][0] == tablero[fila][1] && tablero[fila][1] == tablero[fila][2]&& tablero[fila][2]!=' ') {
+      console.log("TATETI FILA "+fila);
       return true;
     }
   }
   //check diagonal
-  if ((tablero[0][0] == tablero[1][1] && tablero[1][1] == tablero[2][2]) || (tablero[0][2] == tablero[1][1] && tablero[1][1] == tablero[2][0])) {
+  if (((tablero[0][0] == tablero[1][1] && tablero[1][1] == tablero[2][2])&& tablero[2][2]!=' ') 
+  || 
+  ((tablero[0][2] == tablero[1][1] && tablero[1][1] == tablero[2][0])&& tablero[2][0]!=' ')) {
+    console.log("TATETI DIAGONAL");
     return true;
   }
   return false
@@ -45,6 +59,7 @@ router.get('/', function (req, res, next) {
 router.put('/empezar', function (request, response) {
   turno = 0;
   jugadores = request.body.jugadores;
+  numMovimientos=0;
   tablero = [
     [' ', ' ', ' '],
     [' ', ' ', ' '],
@@ -72,9 +87,19 @@ router.put('/movimiento', function (request, response) {
   else {
     tablero[fila][columna] = marcas[turno];
     turno = (turno + 1) % 2;
-    estado = (!checkWinner() ? 'No terminado' : 'Terminado');
-    response.send({ turno: jugadores[turno], tablero: tablero, estado: estado,ganador: jugador});
+    hayGanador = checkWinner();
+    numMovimientos =numMovimientos+ 1;
+    console.log('hayGanador '+hayGanador);
 
+    if (!hayGanador) {
+
+      console.log('numMovimientos '+numMovimientos)
+      estado = (isFull()==true )? 'Terminado. Empate' : 'No terminado'
+      response.send({ turno: jugadores[turno], tablero: tablero, estado: estado });
+    } else {
+      estado='Terminado';
+      response.send({ turno: jugadores[turno], tablero: tablero, estado: estado, ganador: jugador });
+    }
   }
 });
 
