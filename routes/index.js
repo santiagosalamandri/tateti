@@ -9,15 +9,13 @@ var numMovimientos;
 const marcas = ['x', 'o'];
 const MAX_MOVIMIENTOS = 9
 
-function isTie() {
-  return (estado == 'No Terminado' && isFull() == true);
-}
+//Check if there is any move available
 function isFull() {
   return (numMovimientos == MAX_MOVIMIENTOS);
 }
-function checkWinner() {
-  //console.log(tablero);
 
+//check if there is a winner
+function checkWinner() {
   for (let column = 0; column < 3; column++) {  //check column
     if (tablero[0][column] == tablero[1][column] && tablero[1][column] == tablero[2][column] && tablero[2][column]!=' ') {
       console.log("TATETI COLUMNA "+column);
@@ -39,16 +37,17 @@ function checkWinner() {
   }
   return false
 }
+//check current's player turn
 function isMyTurn(player) {
   return (jugadores[turno] == player);
 }
-
+//check if is valid move
 function isValid(pos) {
   return (pos <= 2 && pos >= 0);
 }
-
-function isEmpty(fila, columna) {
-  return (tablero[fila][columna] == ' ');
+//check if is an empty spot
+function isEmpty(row, column) {
+  return (tablero[row][column] == ' ');
 }
 
 /* GET home page. */
@@ -56,6 +55,7 @@ router.get('/', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+//Begin game endpoint
 router.put('/empezar', function (request, response) {
   turno = 0;
   jugadores = request.body.jugadores;
@@ -70,18 +70,20 @@ router.put('/empezar', function (request, response) {
   response.send({ turno: jugadores[turno], tablero: tablero });
 });
 
+//Make a move endpoint
 router.put('/movimiento', function (request, response) {
   const columna = request.body.columna;
   const fila = request.body.fila;
   const jugador = request.body.jugador;
   response.setHeader('Content-Type', 'application/json');
-  if (!isMyTurn(jugador)) {
+
+  if (!isMyTurn(jugador)) { //check is right turn
     response.status(403).send({ turno: jugadores[turno], tablero: tablero, error: "Turno incorrecto" })
   }
-  else if (!isValid(fila) || !isValid(columna)) {
+  else if (!isValid(fila) || !isValid(columna)) {//check is valid move
     response.status(403).send({ turno: jugadores[turno], tablero: tablero, error: "Casillero incorrecto" })
   }
-  else if (!isEmpty(fila, columna)) {
+  else if (!isEmpty(fila, columna)) { //check is busy
     response.status(403).send({ turno: jugadores[turno], tablero: tablero, error: "Casillero Ocupado" })
   }
   else {
@@ -89,11 +91,7 @@ router.put('/movimiento', function (request, response) {
     turno = (turno + 1) % 2;
     hayGanador = checkWinner();
     numMovimientos =numMovimientos+ 1;
-    console.log('hayGanador '+hayGanador);
-
     if (!hayGanador) {
-
-      console.log('numMovimientos '+numMovimientos)
       estado = (isFull()==true )? 'Terminado. Empate' : 'No terminado'
       response.send({ turno: jugadores[turno], tablero: tablero, estado: estado });
     } else {
