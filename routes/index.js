@@ -21,7 +21,7 @@ function checkWinner() {
     }
   }
   //check diagonal
-  if ((tablero[0][0] == tablero[1][1] && tablero[1][1] == tablero[2][2]) || (tablero[0][2] == tablero[1][1] && tablero[1][1] == tablero[2][0])){
+  if ((tablero[0][0] == tablero[1][1] && tablero[1][1] == tablero[2][2]) || (tablero[0][2] == tablero[1][1] && tablero[1][1] == tablero[2][0])) {
     return true;
   }
   return false
@@ -74,7 +74,7 @@ router.put('/movimiento', function (request, response) {
     tablero[fila][columna] = marcas[turno];
     turno = (turno + 1) % 2;
     estado = (!checkWinner() ? 'No terminado' : 'Terminado');
-    response.send({ turno: jugadores[turno], tablero: tablero, estado: estado });
+    response.send({ turno: jugadores[turno], tablero: tablero, estado: estado,ganador: jugador});
 
   }
 });

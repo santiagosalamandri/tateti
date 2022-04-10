@@ -207,6 +207,7 @@ describe("Juego de TaTeTi", () => {
                 res.body.should.be.a('object');
                 res.body.should.have.property('turno').eql('Pedro');
                 res.body.should.have.property('estado').eql('Terminado');
+                res.body.should.have.property('ganador').eql('Juan');
                 res.body.should.have.property('tablero').eql([
                     ['x', 'o', ' '],
                     ['x', 'o', ' '],
@@ -229,6 +230,7 @@ describe("Juego de TaTeTi", () => {
                 res.body.should.be.a('object');
                 res.body.should.have.property('turno').eql('Pedro');
                 res.body.should.have.property('estado').eql('Terminado');
+                res.body.should.have.property('ganador').eql('Juan');
                 res.body.should.have.property('tablero').eql([
                     ['o', 'o', ' '],
                     ['x', 'x', 'x'],
@@ -250,6 +252,7 @@ describe("Juego de TaTeTi", () => {
                 res.body.should.be.a('object');
                 res.body.should.have.property('turno').eql('Pedro');
                 res.body.should.have.property('estado').eql('Terminado');
+                res.body.should.have.property('ganador').eql('Juan');
                 res.body.should.have.property('tablero').eql([
                     [' ', 'o', 'x'],
                     ['o', 'x', ' '],
