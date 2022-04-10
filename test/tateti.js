@@ -23,6 +23,16 @@ describe("Juego de TaTeTi", () => {
     let juego = {
         jugadores: ['Juan', 'Pedro']
     }
+    // ['o', 'o', ' '],
+    // ['x', 'x', 'x'],
+    // [' ', ' ', ' '],
+    let movimientosGanadorFila = [
+        { jugador: 'Juan', columna: 0, fila: 1 },
+        { jugador: 'Pedro', columna: 0, fila: 0 },
+        { jugador: 'Juan', columna: 1, fila: 1 },
+        { jugador: 'Pedro', columna: 1, fila: 0 },
+        { jugador: 'Juan', columna: 2, fila: 1 },
+    ]
     // ['x', 'o', ' '],
     // ['x', 'o', ' '],
     // ['x', ' ', ' '],
@@ -196,8 +206,27 @@ describe("Juego de TaTeTi", () => {
             })
 
         });
-        // it("Cuando un jugador tiene una fila completa", (done) => {
-//        });
+        it("Cuando un jugador tiene una fila completa", (done) => {
+            chai.request(server).put("/empezar").send(juego).end();
+            let index = 0
+            for (; index < movimientosGanadorFila.length - 1; index++) {
+                chai.request(server).put("/movimiento").send(movimientosGanadorFila[index]).end();
+
+            }
+            chai.request(server).put("/movimiento").send(movimientosGanadorFila[index]).end((err, res) => {
+                res.should.have.status(200);
+                res.should.to.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('turno').eql('Pedro');
+                res.body.should.have.property('estado').eql('Terminado');
+                res.body.should.have.property('tablero').eql([
+                    ['o', 'o', ' '],
+                    ['x', 'x', 'x'],
+                    [' ', ' ', ' '],
+                ]);
+                done()
+            })
+        });
         // it("Cuando un jugador tiene una diagonal completa", (done) => {
 
         // });

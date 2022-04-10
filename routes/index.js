@@ -10,11 +10,16 @@ const marcas = ['x', 'o'];
 
 function checkWinner(){
   //check column
-  for (let column = 0; column < 2; column++) {
+  for (let column = 0; column < 3; column++) {
       if(tablero[0][column]==tablero[1][column] && tablero[1][column]==tablero[2][column]){
       return true;
     }
   }
+  for (let fila = 0; fila < 3; fila++) {
+    if(tablero[fila][0]==tablero[fila][1] && tablero[fila][1]==tablero[fila][2]){
+    return true;
+  }
+}
   return false
 }
 function isMyTurn(player) {
