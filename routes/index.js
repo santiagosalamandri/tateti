@@ -4,9 +4,19 @@ var router = express.Router();
 var jugadores;
 var tablero;
 var turno;
+var estado;
 
 const marcas = ['x', 'o'];
 
+function checkWinner(){
+  //check column
+  for (let column = 0; column < 2; column++) {
+      if(tablero[0][column]==tablero[1][column] && tablero[1][column]==tablero[2][column]){
+      return true;
+    }
+  }
+  return false
+}
 function isMyTurn(player) {
   return (jugadores[turno]==player);
 }
@@ -54,7 +64,9 @@ router.put('/movimiento', function (request, response) {
   else {
     tablero[fila][columna] = marcas[turno];
     turno = (turno + 1) % 2;
-    response.send({ turno: jugadores[turno], tablero: tablero });
+    estado= (!checkWinner()?'No terminado':'Terminado');
+    response.send({ turno: jugadores[turno], tablero: tablero ,estado: estado});
+    
   }
 });
 

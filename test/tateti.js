@@ -23,10 +23,10 @@ describe("Juego de TaTeTi", () => {
     let juego = {
         jugadores: ['Juan', 'Pedro']
     }
-    // ['x', 'o', 'x'],
+    // ['x', 'o', ' '],
     // ['x', 'o', ' '],
     // ['x', ' ', ' '],
-    let movimientos = [
+    let movimientosGanadorColumna = [
         { jugador: 'Juan', columna: 0, fila: 0 },
         { jugador: 'Pedro', columna: 1, fila: 0 },
         { jugador: 'Juan', columna: 0, fila: 1 },
@@ -75,7 +75,7 @@ describe("Juego de TaTeTi", () => {
             chai.request(server).put("/empezar").send(juego).end();
             chai.request(server)
                 .put("/movimiento")
-                .send(movimientos[0])
+                .send(movimientosGanadorColumna[0])
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.should.to.be.json;
@@ -93,10 +93,10 @@ describe("Juego de TaTeTi", () => {
     describe("El segundo jugador hace su primer movimiento", () => {
         it("El casillero queda ocupado y le toca al otro jugador", (done) => {
             chai.request(server).put("/empezar").send(juego).end();
-            chai.request(server).put("/movimiento").send(movimientos[0]).end();
+            chai.request(server).put("/movimiento").send(movimientosGanadorColumna[0]).end();
             chai.request(server)
                 .put("/movimiento")
-                .send(movimientos[1])
+                .send(movimientosGanadorColumna[1])
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.should.to.be.json;
@@ -114,7 +114,7 @@ describe("Juego de TaTeTi", () => {
     describe("Movimientos prohibidos", () => {
         it("Jugador intenta ocupar un casillero ocupado ", (done) => {
             chai.request(server).put("/empezar").send(juego).end();
-            chai.request(server).put("/movimiento").send(movimientos[0]).end();
+            chai.request(server).put("/movimiento").send(movimientosGanadorColumna[0]).end();
             chai.request(server)
                 .put("/movimiento")
                 .send({ jugador: 'Pedro', columna: 0, fila: 0 })
@@ -135,7 +135,7 @@ describe("Juego de TaTeTi", () => {
 
         it("Jugador intenta ocupar un casillero fuera del tablero ", (done) => {
             chai.request(server).put("/empezar").send(juego).end();
-            chai.request(server).put("/movimiento").send(movimientos[0]).end();
+            chai.request(server).put("/movimiento").send(movimientosGanadorColumna[0]).end();
             chai.request(server)
                 .put("/movimiento")
                 .send({ jugador: 'Pedro', columna: 3, fila: 3 })
@@ -157,8 +157,8 @@ describe("Juego de TaTeTi", () => {
 
         it("Jugador intenta ocupar un casillero cuando no es su turno ", (done) => {
             chai.request(server).put("/empezar").send(juego).end();
-            chai.request(server).put("/movimiento").send(movimientos[0]).end();
-            chai.request(server).put("/movimiento").send(movimientos[0]).end((err, res) => {
+            chai.request(server).put("/movimiento").send(movimientosGanadorColumna[0]).end();
+            chai.request(server).put("/movimiento").send(movimientosGanadorColumna[0]).end((err, res) => {
                 res.should.have.status(403);
                 res.should.to.be.json;
                 res.body.should.be.a('object');
@@ -173,5 +173,33 @@ describe("Juego de TaTeTi", () => {
             });
         });
     });
+    describe("Juego terminado", () => {
+        it("Cuando un jugador tiene una columna completa", (done) => {
+            chai.request(server).put("/empezar").send(juego).end();
+            let index = 0
+            for (; index < movimientosGanadorColumna.length - 1; index++) {
+                chai.request(server).put("/movimiento").send(movimientosGanadorColumna[index]).end();
 
+            }
+            chai.request(server).put("/movimiento").send(movimientosGanadorColumna[index]).end((err, res) => {
+                res.should.have.status(200);
+                res.should.to.be.json;
+                res.body.should.be.a('object');
+                res.body.should.have.property('turno').eql('Pedro');
+                res.body.should.have.property('estado').eql('Terminado');
+                res.body.should.have.property('tablero').eql([
+                    ['x', 'o', ' '],
+                    ['x', 'o', ' '],
+                    ['x', ' ', ' '],
+                ]);
+                done()
+            })
+
+        });
+        // it("Cuando un jugador tiene una fila completa", (done) => {
+//        });
+        // it("Cuando un jugador tiene una diagonal completa", (done) => {
+
+        // });
+    });
 });
